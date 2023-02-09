@@ -12,9 +12,9 @@ class Connexion {
   def seConnecter(): Properties = {
     //Class.forName("org.oracle.Driver") //Charger les pilotes
     //Class.forName("oracle.jdbc.driver.OracleDriver")//Charger les pilotes
-    Class.forName("org.postgresql.Driver")
+    //Class.forName("org.postgresql.Driver")
 
-    connectionProperties.setProperty("driver", "org.postgresql.Driver")
+    connectionProperties.setProperty("driver", "oracle.jdbc.driver.OracleDriver")
     connectionProperties.setProperty("user", username)
     connectionProperties.setProperty("password", password)
     connectionProperties
