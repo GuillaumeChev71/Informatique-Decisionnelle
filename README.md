@@ -20,5 +20,22 @@ Data warehouse :
     - Type de compliment le plus reçu
     - Nombre de fan
 
+Variable d'environnement du projet : 
+```shell
+export JAVA HOME=/usr/gide/jdk-1.8
+export PATH=usr/gide/jdk-1.8/bin:$PATH
+
+export PATH=/usr/gide/sbt-1.3.13/bin:$PATH
+```
+
+Compilation du projet : 
+```shell
+sbt clean compile
+```
+
+Execution du projet : 
+```shell
+sbt run
+```
 
 
