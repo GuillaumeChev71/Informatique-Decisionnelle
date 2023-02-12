@@ -1,6 +1,11 @@
 
 object Main {
   def main(args: Array[String]): Unit = {
+
+    val conn: Connexion = new Connexion("Oracle")
+    println(conn.url)
+
+    /*
     //Initialisation de Spark
     val spark = SparkSession.builder.appName("ETL").master("local[4]").getOrCreate()
 
@@ -15,9 +20,9 @@ object Main {
     // Suppression de la colonne "business" dans le DataFrame users
     //businesses = businesses.drop(col("business"))
 
-    val conn: Connexion = new Connexion()
+    val conn: ConnexionOracle = new ConnexionOracle()
 
     // Enregistrement du DataFrame users dans la table "business"
-    business.write.mode(SaveMode.Overwrite).jdbc(conn.retournerUrl(), "business", conn.seConnecter())
+    business.write.mode(SaveMode.Overwrite).jdbc(conn.retournerUrl(), "business", conn.seConnecter())*/
   }
 }

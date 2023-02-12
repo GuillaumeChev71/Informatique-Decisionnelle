@@ -1,27 +1,22 @@
 import java.util.Properties
 
-class Connexion {
-
+class Connexion(private var typeConnexion:String) {
   // Class variables
-  var connectionProperties:Properties = new Properties()
-  var url: String = "jdbc:oracle:thin:@eluard.iem:1521:ENSE2022"
+  var connectionProperties: Properties = new Properties()
+  var url: String = ""
   var username: String = "ch098407"
   var password: String = "ch098407"
 
-  // Charger les pilotes
-  def seConnecter(): Properties = {
-    //Class.forName("org.oracle.Driver") //Charger les pilotes
-    //Class.forName("oracle.jdbc.driver.OracleDriver")//Charger les pilotes
-    //Class.forName("org.postgresql.Driver")
+  //Initialisation des variables
+  connectionProperties.setProperty("user", username)
+  connectionProperties.setProperty("password", password)
 
+  if(typeConnexion.equals("Oracle")){
+    url = "jdbc:oracle:thin:@stendhal.iem:1521:ENSS2022"
     connectionProperties.setProperty("driver", "oracle.jdbc.driver.OracleDriver")
-    connectionProperties.setProperty("user", username)
-    connectionProperties.setProperty("password", password)
-    connectionProperties
-  }
-
-  def retournerUrl(): String = {
-    url
+  }else{
+    url = "jdbc:postgresql://stendhal:5432/tpid2020"
+    connectionProperties.setProperty("driver", "org.postgresql.Driver")
   }
 
 }
