@@ -2,8 +2,19 @@
 object Main {
   def main(args: Array[String]): Unit = {
 
-    val conn: Connexion = new Connexion("Oracle")
+    val conn: Connexion = new Connexion("Postgres")
     println(conn.url)
+
+
+    //Initialisation de Spark
+    val spark = SparkSession.builder.appName("ETL").master("local[4]").getOrCreate()
+
+    spark.read
+      .option("partitionColumn", "yelping_since")
+      .option("lowerBound", "2004-10-12")
+      .option("upperBound", "2019-12-13")
+      .option("numPartitions", 50)
+      .jdbc(conn.url, "yelp.\"user\"", conn.connectionProperties)
 
     /*
     //Initialisation de Spark
