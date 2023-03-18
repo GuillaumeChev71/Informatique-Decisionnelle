@@ -9,7 +9,17 @@ Data warehouse :
   - Par geographie aussi
   - notation pas rapport au menu
   - Notation si ils ont un parking
-  - Nombre de visiteur
+  - Nombre de visiteur par mois
+  - Restaurant les plus populaire par ville
+  - Le nombre de nouveau avis pour chaque restaurant chaque mois
+  - Les utilisateurs les plus affluent
+  - Le nombre total de restaurant qui ont chargé chaque mois
+  - peut-on distinguer une évolution temporelle des notes ?
+  - quels sont les commerces dont les notes augmentent le plus ?
+  - quels types de commerces sont les plus notés, les mieux notés, les moins bien notés
+  - les caractéristiques annexes comme les menus végétariens dans les restaurants influent-elles sur la notation ?
+
+
 
 - Data mart : Utilisateurs au sein de l'applis
   - Utilisateur qui visite souvent
@@ -39,7 +49,7 @@ Execution du projet :
 ```shell
 sbt run
 
-sbt run -J-Xmx4G
+sbt run -J-Xmx8G
 ```
 
 
@@ -77,3 +87,9 @@ mdp metabase :
 ```
 ClementGuillaumeMathias3
 ```
+
+
+Réinitialiser BD sur metabase : Paramètre -> Réglage administrateur -> Base de données -> clique sur la base -> synchroniser le schéma de base de données 
+
+
+
