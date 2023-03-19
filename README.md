@@ -4,8 +4,7 @@ Data warehouse :
   - Analyse secteur activite (horaire d'ouverture)
   - nb commentaire
   - moyenne etoile
-  - nbClient
-  - Tout ça part jour par semaine par mois
+  - nombre de visite
   - Par geographie aussi
   - notation pas rapport au menu
   - Notation si ils ont un parking
@@ -13,7 +12,6 @@ Data warehouse :
   - Restaurant les plus populaire par ville
   - Le nombre de nouveau avis pour chaque restaurant chaque mois
   - Les utilisateurs les plus affluent
-  - Le nombre total de restaurant qui ont chargé chaque mois
   - peut-on distinguer une évolution temporelle des notes ?
   - quels sont les commerces dont les notes augmentent le plus ?
   - quels types de commerces sont les plus notés, les mieux notés, les moins bien notés
@@ -22,14 +20,15 @@ Data warehouse :
 
 
 - Data mart : Utilisateurs au sein de l'applis
-  - Utilisateur qui visite souvent
-  - Utilisateur qui commentent souvent
-  - Utilisateurs qui ont le plus de réaction à leurs commentaire
-  - nombre d'amis
+  - Utilisateur qui visite souvent TOP 10
+  - Utilisateur qui commentent souvent TOP 10
+  - Utilisateurs qui ont le plus de réaction à leurs commentaire TOP 10
   - Le nombre d'arrivé des utilisateurs par années par mois, jours etc
-  - Pourcentage entre des commentaires drole ou cool
+  - Type de commentaires drole ou cool ou utile le plus sur le site
   - Type de compliment le plus reçu
-  - Nombre de fan
+  - Nombre d'amis influent sur le nombre de commentaire
+  - pareil pour les fans
+  - Pour chaque personne on prend le max des 3 type de vote (nbVoteFunny, nbVoteCool et nbVoteUseful) pour savoir lequel représente le plus la personne et on compte le nombre de commentaire par type de personne 
 
 Variable d'environnement du projet :
 ```shell
