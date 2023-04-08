@@ -18,7 +18,6 @@ object Main {
     val dialect = new OracleDialect
     JdbcDialects.registerDialect(dialect)
 
-
     //Initialisation de Spark
     val spark = SparkSession.builder.appName("ETL").master("local[4]").getOrCreate()
 
@@ -244,9 +243,9 @@ object Main {
     // Création de la dimension Time et récupération du mois, de la semaine et de l'année d'une date
     var debutDimensionTime = tipReviewAndCheckinSansDoublon.select(
       col("date"),
-      year(col("date")).as("year"),
-      month(col("date")).as("month"),
-      weekofyear(col("date")).as("week")
+      year(col("date")).cast("string").as("year"),
+      month(col("date")).cast("string").as("month"),
+      weekofyear(col("date")).cast("string").as("week")
     ).distinct()
     .withColumn("idTime", monotonically_increasing_id())
 
@@ -388,7 +387,7 @@ object Main {
     .withColumn("moyenneVoteFunny", lit(null))
     .withColumn("moyenneVoteCool", lit(null))
     .withColumn("moyenneVoteUseful", lit(null))
-    .withColumn("date", lit(null))
+    .withColumn("idTime", lit(null))
 
     // Aggregation Review
     var aggregationReviewForUser = review.groupBy("user_id", "date").agg(
@@ -400,14 +399,40 @@ object Main {
       avg("funny").as("moyenneVoteFunny"),
       avg("cool").as("moyenneVoteCool"),
       avg("useful").as("moyenneVoteUseful")
-    ).withColumn("nbAmis", lit(null))
+    )
+
+    // Création de la dimension Time et récupération du mois, de la semaine et de l'année d'une date
+    var debutDimensionTimeUser = aggregationReviewForUser.select(
+      col("date"),
+      year(col("date")).cast("string").as("year"),
+      month(col("date")).cast("string").as("month"),
+      weekofyear(col("date")).cast("string").as("week")
+    ).distinct()
+    .withColumn("idTime", monotonically_increasing_id())
+
+
+    // Jointure pour l'id du time
+    var reviewUser = aggregationReviewForUser
+      .join(debutDimensionTimeUser, aggregationReviewForUser("date") === debutDimensionTimeUser("date"), "inner")
+      .select(
+        debutDimensionTimeUser("idTime"),
+        aggregationReviewForUser("user_id").as("id_user"),
+        aggregationReviewForUser("nbCommentaire"),
+        aggregationReviewForUser("moyenneStars"),
+        aggregationReviewForUser("nbVoteFunny"),
+        aggregationReviewForUser("nbVoteCool"),
+        aggregationReviewForUser("nbVoteUseful"),
+        aggregationReviewForUser("moyenneVoteFunny"),
+        aggregationReviewForUser("moyenneVoteCool"),
+        aggregationReviewForUser("moyenneVoteUseful")
+      ).withColumn("nbAmis", lit(null))
     .withColumn("nbElite", lit(null))
     .withColumn("nbFans", lit(null))
 
     //Union entre aggregationReviewForUser et jointureEliteFriendAndUser
-    var unionReviewAndUser = aggregationReviewForUser.select(
-      col("user_id").as("id_user"),
-      col("date"),
+    var unionReviewAndUser = reviewUser.select(
+      col("id_user"),
+      col("idTime"),
       col("nbCommentaire"),
       col("moyenneStars"),
       col("nbVoteFunny"),
@@ -421,7 +446,7 @@ object Main {
       col("nbFans")
     ).union(jointureEliteFriendAndUser.select(
       col("user_id").as("id_user"),
-      col("date"),
+      col("idTime"),
       col("nbCommentaire"),
       col("moyenneStars"),
       col("nbVoteFunny"),
@@ -436,8 +461,9 @@ object Main {
     ))
 
 
+
     //Regroupement des données pour supprimer les doublons sur les dimensions
-    var reviewAndUserSansDoublon = unionReviewAndUser.groupBy("id_user", "date").agg(
+    var factTableUser = unionReviewAndUser.groupBy("id_user", "idTime").agg(
       sum("nbCommentaire").as("nbCommentaire"),
       avg("moyenneStars").as("moyenneStars"),
       sum("nbVoteFunny").as("nbVoteFunny"),
@@ -452,37 +478,7 @@ object Main {
     )
 
 
-    // Création de la dimension Time et récupération du mois, de la semaine et de l'année d'une date
-    var debutDimensionTimeUser = reviewAndUserSansDoublon.select(
-      col("date"),
-      year(col("date")).as("year"),
-      month(col("date")).as("month"),
-      weekofyear(col("date")).as("week")
-    ).distinct()
-    .withColumn("idTime", monotonically_increasing_id())
-
-
-    // Jointure pour l'id du time
-    var factTableUser = reviewAndUserSansDoublon
-      .join(debutDimensionTimeUser, reviewAndUserSansDoublon("date") === debutDimensionTimeUser("date"), "inner")
-      .select(
-        debutDimensionTimeUser("idTime"),
-        reviewAndUserSansDoublon("id_user"),
-        reviewAndUserSansDoublon("nbCommentaire"),
-        reviewAndUserSansDoublon("moyenneStars"),
-        reviewAndUserSansDoublon("nbVoteFunny"),
-        reviewAndUserSansDoublon("nbVoteCool"),
-        reviewAndUserSansDoublon("nbVoteUseful"),
-        reviewAndUserSansDoublon("moyenneVoteFunny"),
-        reviewAndUserSansDoublon("moyenneVoteCool"),
-        reviewAndUserSansDoublon("moyenneVoteUseful"),
-        reviewAndUserSansDoublon("nbAmis"),
-        reviewAndUserSansDoublon("nbElite"),
-        reviewAndUserSansDoublon("nbFans")
-      )
-
-
-
+    // Création de la dimension Time de user
     var dimensionTimeUser = debutDimensionTimeUser.select(
       col("idTime"),
       to_date(col("date"), "yyyy-MM-dd").as("date"),
@@ -491,6 +487,7 @@ object Main {
       col("week")
     )
 
+    // Création de la dimension User
     var dimensionUser = user.select(
       col("user_id").as("id_user"),
       col("name"),
@@ -531,7 +528,7 @@ object Main {
     //Table de fait
     factTableUser.write.mode(SaveMode.Overwrite).jdbc(connOracle.url, "FACT_USER", connOracle.connectionProperties)
 
-    /*******************************************/
+    *******************************************/
 
     spark.stop()
   }
